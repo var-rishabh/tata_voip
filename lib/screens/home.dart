@@ -13,6 +13,7 @@ class _HomeState extends State<Home> {
   String callStatus = 'Idle';
 
   TextEditingController numberController = TextEditingController();
+  FocusNode numberFocusNode = FocusNode();
 
   void startCall(String number) async {
     changeCallStatus('Dialing ... ');
@@ -29,12 +30,14 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    initLinSDK();
+    // initLinSDK();
+    login();
   }
 
   @override
   void dispose() {
     numberController.dispose();
+    numberFocusNode.dispose();
     super.dispose();
   }
 
@@ -46,8 +49,9 @@ class _HomeState extends State<Home> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              width: 300,
+              width: 250,
               child: CupertinoTextField(
+                focusNode: numberFocusNode,
                 controller: numberController,
                 keyboardType: TextInputType.number,
                 placeholder: 'Enter number',
@@ -55,6 +59,11 @@ class _HomeState extends State<Home> {
                   color: CupertinoColors.inactiveGray,
                 ),
                 padding: const EdgeInsets.all(16),
+                maxLength: 10,
+                style: const TextStyle(
+                  color: CupertinoColors.black,
+                  fontSize: 30,
+                ),
                 decoration: BoxDecoration(
                   color: CupertinoColors.white,
                   borderRadius: BorderRadius.circular(8),
@@ -78,7 +87,7 @@ class _HomeState extends State<Home> {
                 ),
               ),
               onPressed: () {
-                startCall('6301450563');
+                startCall(numberController.text);
               },
             ),
           ],

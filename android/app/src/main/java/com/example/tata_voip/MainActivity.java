@@ -11,17 +11,44 @@ import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.embedding.engine.FlutterEngine;
 
+import org.linphone.core.Call;
 import org.linphone.core.Core;
+import org.linphone.core.CoreListenerStub;
+import org.linphone.core.Factory;
 
 public class MainActivity extends FlutterActivity {
     private static final String CHANNEL = "com.tata/voip";
     private static final String TAG = "LIN_SDK";
 
     private static Core linPhoneCore;
+    private Call currentCall = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Factory factory = Factory.instance();
+        linPhoneCore = factory.createCore(null, null, this);
+
+        Log.i(TAG, "Linphone SDK initialized" + linPhoneCore);
+
+        linPhoneCore.addListener(new CoreListenerStub() {
+            @Override
+            public void onCallStateChanged(@NonNull Core core, @NonNull Call call, Call.State state, @NonNull String message) {
+                if (state == Call.State.IncomingReceived) {
+                    call.accept();
+                    Log.d(TAG, "Incoming call accepted");
+                } else if (state == Call.State.Connected) {
+                    currentCall = call;
+                    Log.d(TAG, "Call connected" + currentCall + " " + message);
+                } else if (state == Call.State.End) {
+                    currentCall = null;
+                    Log.d(TAG, "Call ended");
+                } else {
+                    Log.d(TAG, "Call state: " + state + ", message: " + message);
+                }
+            }
+        });
     }
 
     @Override
@@ -30,15 +57,6 @@ public class MainActivity extends FlutterActivity {
 
         new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL).setMethodCallHandler((call, result) -> {
             switch (call.method) {
-                case "initLinSDK":
-                    linPhoneCore = Auth.initLinSDK(this);
-                    if (linPhoneCore != null) {
-                        result.success("SDK initialized");
-                    } else {
-                        result.error("INIT_ERROR", "Failed to initialize SDK", null);
-                    }
-                    break;
-
                 case "loginLinSDK":
                     boolean isLoginSuccess = Auth.login(
                             linPhoneCore,

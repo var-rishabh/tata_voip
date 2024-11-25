@@ -17,15 +17,15 @@ import org.linphone.core.TransportType;
 public class Auth extends CoreListenerStub {
     private static final String TAG = "LIN_SDK";
 
-    public static Core initLinSDK(Context context) {
-        try {
-            Factory factory = Factory.instance();
-            return factory.createCore(null, null, context);
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to initialize Linphone SDK", e);
-            return null;
-        }
-    }
+//    public static Core initLinSDK(Context context) {
+//        try {
+//            Factory factory = Factory.instance();
+//            return factory.createCore(null, null, context);
+//        } catch (Exception e) {
+//            Log.e(TAG, "Failed to initialize Linphone SDK", e);
+//            return null;
+//        }
+//    }
 
     public static boolean login(Core linPhoneCore, String userName, String password, String domain) {
         try {
@@ -55,8 +55,6 @@ public class Auth extends CoreListenerStub {
             linPhoneCore.addAccount(account);
             linPhoneCore.setDefaultAccount(account);
 
-//            account.addListener((acc, state, message) -> org.linphone.core.tools.Log.i("[LIN_SDK] Registration state changed: " + state + ", " + message));
-
             linPhoneCore.start();
             return true;
         } catch (Exception e) {
@@ -75,8 +73,6 @@ public class Auth extends CoreListenerStub {
             params.setMediaEncryption(MediaEncryption.None);
 
             linPhoneCore.inviteAddressWithParams(remoteAddress, params);
-
-//            linPhoneCore.inviteAddress(remoteAddress);
             return true;
         } catch (Exception e) {
             Log.e(TAG, "Failed to make call", e);
