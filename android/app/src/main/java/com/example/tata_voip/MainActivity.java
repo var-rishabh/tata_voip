@@ -30,7 +30,7 @@ public class MainActivity extends FlutterActivity {
         Factory factory = Factory.instance();
         linPhoneCore = factory.createCore(null, null, this);
 
-        Log.i(TAG, "Linphone SDK initialized" + linPhoneCore);
+        Log.i(TAG, "SDK Initialized " + linPhoneCore);
 
         linPhoneCore.addListener(new CoreListenerStub() {
             @Override

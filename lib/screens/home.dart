@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 
 import '../helper/method_channel.dart';
+import '../provider/call.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -10,87 +12,72 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  String callStatus = 'Idle';
-
-  TextEditingController numberController = TextEditingController();
-  FocusNode numberFocusNode = FocusNode();
-
-  void startCall(String number) async {
-    changeCallStatus('Dialing ... ');
-    String response = await makeCall(number);
-    changeCallStatus(response);
-  }
-
-  void changeCallStatus(String status) {
-    setState(() {
-      callStatus = status;
-    });
-  }
+  Map<String, String> contacts = {
+    "Anurudh": "7025025081",
+    "Radioactive": "7015507141",
+    "Rishabh": "7078202575",
+    "Vijay": "6301450563",
+  };
 
   @override
   void initState() {
     super.initState();
-    // initLinSDK();
     login();
   }
 
   @override
-  void dispose() {
-    numberController.dispose();
-    numberFocusNode.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final CallProvider callProvider =
+        Provider.of<CallProvider>(context, listen: false);
+
     return CupertinoPageScaffold(
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 250,
-              child: CupertinoTextField(
-                focusNode: numberFocusNode,
-                controller: numberController,
-                keyboardType: TextInputType.number,
-                placeholder: 'Enter number',
-                placeholderStyle: const TextStyle(
-                  color: CupertinoColors.inactiveGray,
-                ),
-                padding: const EdgeInsets.all(16),
-                maxLength: 10,
-                style: const TextStyle(
-                  color: CupertinoColors.black,
-                  fontSize: 30,
-                ),
-                decoration: BoxDecoration(
-                  color: CupertinoColors.white,
-                  borderRadius: BorderRadius.circular(8),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+        physics: const BouncingScrollPhysics(),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 25),
+                child: Text(
+                  'Runo X Tata',
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: CupertinoColors.activeBlue,
+                    letterSpacing: 2,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 36),
-            Text(
-              callStatus,
-              style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 36),
-            CupertinoButton(
-              borderRadius: BorderRadius.circular(8),
-              color: CupertinoColors.activeBlue,
-              child: const Text(
-                'Call',
-                style: TextStyle(
-                  color: CupertinoColors.white,
-                  fontSize: 24,
+              for (String name in contacts.keys)
+                CupertinoListTile(
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  title: Text(
+                    name,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  trailing: GestureDetector(
+                    onTap: () => callProvider.startCall(contacts[name]!),
+                    child: const Icon(
+                      CupertinoIcons.phone,
+                      size: 35,
+                      color: CupertinoColors.activeBlue,
+                    ),
+                  ),
+                  subtitle: Text(
+                    "+91 ${contacts[name]!}",
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
-              ),
-              onPressed: () {
-                startCall(numberController.text);
-              },
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
