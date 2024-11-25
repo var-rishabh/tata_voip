@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
+import '../helper/native_channel.dart';
 import '../provider/call.dart';
 
 class CallScreen extends StatefulWidget {
@@ -21,6 +22,38 @@ class _CallScreenState extends State<CallScreen> {
   @override
   void initState() {
     super.initState();
+    final CallProvider callProvider =
+        Provider.of<CallProvider>(context, listen: false);
+
+    callProvider.startCall(widget.contactNumber);
+
+    NativeChannel.startListening(
+      (event) {
+        String key = event.keys.first.toString();
+        switch (key) {
+          case 'OUTGOING_RINGING':
+            callProvider.changeCallStatus('Ringing ...');
+            break;
+
+          case "CALL_CONNECTED":
+            callProvider.changeCallStatus('Connecting ...');
+            break;
+
+          case "STREAMS_RUNNING":
+            callProvider.startTime();
+            break;
+
+          case "CALL_ENDED":
+            callProvider.changeCallStatus("Call Ended");
+            break;
+
+          case "CALL_RELEASED":
+            callProvider.resetEverything();
+            Navigator.pop(context);
+            break;
+        }
+      },
+    );
   }
 
   @override
@@ -51,7 +84,9 @@ class _CallScreenState extends State<CallScreen> {
               ),
               const SizedBox(height: 30),
               Text(
-                callProvider.callStatus,
+                callProvider.callStatus == 'timer'
+                    ? callProvider.formattedTime
+                    : callProvider.callStatus,
                 style: const TextStyle(
                   fontSize: 20,
                   color: CupertinoColors.activeGreen,
@@ -71,8 +106,7 @@ class _CallScreenState extends State<CallScreen> {
               ),
               GestureDetector(
                 onTap: () {
-                  // callProvider.startCall(widget.contactNumber);
-                  Navigator.of(context).pop();
+                  callProvider.hangUpCall();
                 },
                 child: Container(
                   padding: const EdgeInsets.all(30),

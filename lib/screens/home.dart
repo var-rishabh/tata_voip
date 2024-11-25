@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:provider/provider.dart';
 
 import '../helper/method_channel.dart';
-import '../provider/call.dart';
 import 'call_screen.dart';
 
 class Home extends StatefulWidget {
@@ -28,9 +26,6 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    final CallProvider callProvider =
-        Provider.of<CallProvider>(context, listen: false);
-
     return CupertinoPageScaffold(
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),

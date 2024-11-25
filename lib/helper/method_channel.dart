@@ -12,16 +12,21 @@ Future<void> login() async {
   }
 }
 
-Future<String> makeCall(String number) async {
+Future<void> makeCall(String number) async {
   try {
-    String response = await platform.invokeMethod(
+    await platform.invokeMethod(
       'makeCall',
       {'number': number},
     );
-    print('$tag | $response');
-    return response;
   } catch (e) {
     print('$tag | Failed to make call: $e');
-    return e.toString();
+  }
+}
+
+Future<void> endCall() async {
+  try {
+    await platform.invokeMethod('endCall');
+  } catch (e) {
+    print('$tag | Failed to end call: $e');
   }
 }

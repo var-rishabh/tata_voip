@@ -3,17 +3,13 @@ package com.example.tata_voip;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.example.tata_voip.lin.Auth;
-
 import androidx.annotation.NonNull;
 
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.embedding.engine.FlutterEngine;
 
-import org.linphone.core.Call;
 import org.linphone.core.Core;
-import org.linphone.core.CoreListenerStub;
 import org.linphone.core.Factory;
 
 public class MainActivity extends FlutterActivity {
@@ -21,7 +17,6 @@ public class MainActivity extends FlutterActivity {
     private static final String TAG = "LIN_SDK";
 
     private static Core linPhoneCore;
-    private Call currentCall = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,36 +27,24 @@ public class MainActivity extends FlutterActivity {
 
         Log.i(TAG, "SDK Initialized " + linPhoneCore);
 
-        linPhoneCore.addListener(new CoreListenerStub() {
-            @Override
-            public void onCallStateChanged(@NonNull Core core, @NonNull Call call, Call.State state, @NonNull String message) {
-                if (state == Call.State.IncomingReceived) {
-                    call.accept();
-                    Log.d(TAG, "Incoming call accepted");
-                } else if (state == Call.State.Connected) {
-                    currentCall = call;
-                    Log.d(TAG, "Call connected" + currentCall + " " + message);
-                } else if (state == Call.State.End) {
-                    currentCall = null;
-                    Log.d(TAG, "Call ended");
-                } else {
-                    Log.d(TAG, "Call state: " + state + ", message: " + message);
-                }
-            }
-        });
+        CallListener callListener = new CallListener();
+        linPhoneCore.addListener(callListener);
     }
 
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
         super.configureFlutterEngine(flutterEngine);
 
+        MethodChannel methodChannel = new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL);
+        EventNotifier.setChannel(methodChannel);
+
         new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL).setMethodCallHandler((call, result) -> {
             switch (call.method) {
                 case "loginLinSDK":
-                    boolean isLoginSuccess = Auth.login(
+                    boolean isLoginSuccess = LinOperation.login(
                             linPhoneCore,
-                            "0605405970002",
-                            "$eWPQD!Ypy",
+                            "0605405970004",
+                            "fgabSjMxQv",
                             "sip-bgn-int.ttsl.tel:49868"
                     );
                     if (isLoginSuccess) {
@@ -74,15 +57,20 @@ public class MainActivity extends FlutterActivity {
                 case "makeCall":
                     String number = call.argument("number");
                     Log.d(TAG, "Making call to " + number);
-                    boolean isCallSuccess = Auth.makeCall(
+                    boolean isCallSuccess = LinOperation.makeCall(
                             linPhoneCore,
                             number,
                             "sip-bgn-int.ttsl.tel:49868"
                     );
-                    if (isCallSuccess) {
-                        result.success("Ringing ...");
-                    } else {
+                    if (!isCallSuccess) {
                         result.error("CALL_ERROR", "Call failed", null);
+                    }
+                    break;
+
+                case "endCall":
+                    int isCallEnded = LinOperation.hangUp(linPhoneCore);
+                    if (isCallEnded != 0) {
+                        result.error("HANGUP_ERROR", "Failed to end call", null);
                     }
                     break;
 

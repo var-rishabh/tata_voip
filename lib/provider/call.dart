@@ -1,11 +1,12 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+
+import 'package:flutter/cupertino.dart';
 
 import '../helper/method_channel.dart';
 
 class CallProvider extends ChangeNotifier {
-  String callStatus = 'Dialing ... ';
-
-  String timer = '00:00:00';
+  String callStatus = 'Dialing ...';
+  String formattedTime = '00:00';
 
   bool isMuted = false;
   bool isSpeakerOn = false;
@@ -13,9 +14,16 @@ class CallProvider extends ChangeNotifier {
   TextEditingController numberController = TextEditingController();
   FocusNode numberFocusNode = FocusNode();
 
+  Timer? _timer;
+  int _secondsElapsed = 0;
+
   void startCall(String number) async {
-    String response = await makeCall(number);
-    changeCallStatus(response);
+    await makeCall(number);
+  }
+
+  void hangUpCall() async {
+    await endCall();
+    stopTime();
   }
 
   void toggleMute() {
@@ -29,37 +37,45 @@ class CallProvider extends ChangeNotifier {
   }
 
   void startTime() {
-    int seconds = 0;
-    int minutes = 0;
-    int hours = 0;
-    Future.delayed(const Duration(seconds: 1), () {
-      seconds++;
-      if (seconds == 60) {
-        seconds = 0;
-        minutes++;
-      }
-      if (minutes == 60) {
-        minutes = 0;
-        hours++;
-      }
-      timer = '$hours:$minutes:$seconds';
+    stopTime();
+    changeCallStatus("timer");
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      _secondsElapsed++;
+      int minutes = (_secondsElapsed % 3600) ~/ 60;
+      int seconds = _secondsElapsed % 60;
+
+      formattedTime = '${_formatTime(minutes)}:${_formatTime(seconds)}';
       notifyListeners();
-      startTime();
     });
   }
 
-  void resetTime() {
-    timer = '00:00:00';
+  void stopTime() {
+    _timer?.cancel();
+    _timer = null;
+    _secondsElapsed = 0;
+    formattedTime = '00:00';
     notifyListeners();
   }
+
+  String _formatTime(int value) => value.toString().padLeft(2, '0');
 
   void changeCallStatus(String status) {
     callStatus = status;
     notifyListeners();
   }
 
+  void resetEverything() {
+    stopTime();
+    changeCallStatus('Dialing ... ');
+    isMuted = false;
+    isSpeakerOn = false;
+    notifyListeners();
+  }
+
   @override
   void dispose() {
+    _timer?.cancel();
     numberController.dispose();
     numberFocusNode.dispose();
     super.dispose();

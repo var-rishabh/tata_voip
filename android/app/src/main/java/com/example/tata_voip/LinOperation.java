@@ -1,6 +1,5 @@
-package com.example.tata_voip.lin;
+package com.example.tata_voip;
 
-import android.content.Context;
 import android.util.Log;
 
 import org.linphone.core.Account;
@@ -14,7 +13,7 @@ import org.linphone.core.Factory;
 import org.linphone.core.MediaEncryption;
 import org.linphone.core.TransportType;
 
-public class Auth extends CoreListenerStub {
+public class LinOperation extends CoreListenerStub {
     private static final String TAG = "LIN_SDK";
 
     public static boolean login(Core linPhoneCore, String userName, String password, String domain) {
@@ -67,6 +66,15 @@ public class Auth extends CoreListenerStub {
         } catch (Exception e) {
             Log.e(TAG, "Failed to make call", e);
             return false;
+        }
+    }
+
+    public static int hangUp(Core linPhoneCore) {
+        try {
+            return linPhoneCore.terminateAllCalls();
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to hang up", e);
+            return -1;
         }
     }
 }
