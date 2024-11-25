@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../helper/method_channel.dart';
 import '../provider/call.dart';
+import 'call_screen.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -61,7 +62,16 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                   trailing: GestureDetector(
-                    onTap: () => callProvider.startCall(contacts[name]!),
+                    onTap: () => {
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(
+                          builder: (_) => CallScreen(
+                            contactName: name,
+                            contactNumber: contacts[name]!,
+                          ),
+                        ),
+                      ),
+                    },
                     child: const Icon(
                       CupertinoIcons.phone,
                       size: 35,

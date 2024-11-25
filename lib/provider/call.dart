@@ -3,17 +3,29 @@ import 'package:flutter/material.dart';
 import '../helper/method_channel.dart';
 
 class CallProvider extends ChangeNotifier {
-  String callStatus = 'Idle';
+  String callStatus = 'Dialing ... ';
 
   String timer = '00:00:00';
+
+  bool isMuted = false;
+  bool isSpeakerOn = false;
 
   TextEditingController numberController = TextEditingController();
   FocusNode numberFocusNode = FocusNode();
 
   void startCall(String number) async {
-    changeCallStatus('Dialing ... ');
     String response = await makeCall(number);
     changeCallStatus(response);
+  }
+
+  void toggleMute() {
+    isMuted = !isMuted;
+    notifyListeners();
+  }
+
+  void toggleSpeaker() {
+    isSpeakerOn = !isSpeakerOn;
+    notifyListeners();
   }
 
   void startTime() {
