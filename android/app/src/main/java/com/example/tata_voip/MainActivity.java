@@ -87,6 +87,15 @@ public class MainActivity extends FlutterActivity {
                     result.success(isMuteOn);
                     break;
 
+                case "answerCall":
+                    int isCallAnswered = LinOperation.answerCall();
+                    if (isCallAnswered != 0) {
+                        result.error("ANSWER_ERROR", "Failed to answer call", null);
+                    } else {
+                        result.success(1);
+                    }
+                    break;
+
                 case "endCall":
                     int isCallEnded = LinOperation.hangUp(linPhoneCore);
                     if (isCallEnded != 0) {

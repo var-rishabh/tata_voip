@@ -3,14 +3,18 @@ package com.example.tata_voip;
 import org.linphone.core.Call;
 import org.linphone.core.Core;
 import org.linphone.core.CoreListenerStub;
+import org.linphone.core.Reason;
+
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import java.util.HashMap;
+
 public class CallListener extends CoreListenerStub {
     private static final String TAG = "LIN_SDK";
 
-    private Call currentCall;
+    private static Call currentCall;
 
     public CallListener() {}
 
@@ -21,6 +25,12 @@ public class CallListener extends CoreListenerStub {
                 Log.d(TAG, "Idle");
                 break;
             case IncomingReceived:
+                if (currentCall != null) {
+                    call.terminate();
+                }
+                currentCall = call;
+                String userName = currentCall.getRemoteAddress().getUsername();
+                EventNotifier.notify("INCOMING_RECEIVED", userName);
                 Log.d(TAG, "IncomingReceived");
                 break;
             case PushIncomingReceived:
@@ -95,7 +105,11 @@ public class CallListener extends CoreListenerStub {
         }
     }
 
-    public Call getCurrentCall() {
+    public static Call getCurrentCall() {
         return currentCall;
+    }
+
+    public static void setCurrentCall(Call call) {
+        currentCall = call;
     }
 }

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../helper/native_channel.dart';
 import '../provider/call.dart';
+import 'home.dart';
 
 class CallScreen extends StatefulWidget {
   final String contactName;
@@ -19,13 +20,23 @@ class CallScreen extends StatefulWidget {
 }
 
 class _CallScreenState extends State<CallScreen> {
+  late CallProvider callProvider;
+
   @override
   void initState() {
     super.initState();
-    final CallProvider callProvider =
-        Provider.of<CallProvider>(context, listen: false);
+    callProvider = Provider.of<CallProvider>(context, listen: false);
 
-    callProvider.startCall(widget.contactNumber);
+    callProvider.setOnCallReleasedCallback(() {
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          CupertinoPageRoute(
+            builder: (_) => const Home(),
+          ),
+          (route) => false,
+        );
+      }
+    });
 
     NativeChannel.startListening(
       (event) {
@@ -49,11 +60,16 @@ class _CallScreenState extends State<CallScreen> {
 
           case "CALL_RELEASED":
             callProvider.resetEverything();
-            Navigator.pop(context);
             break;
         }
       },
     );
+  }
+
+  @override
+  void dispose() {
+    callProvider.setOnCallReleasedCallback(() {});
+    super.dispose();
   }
 
   @override

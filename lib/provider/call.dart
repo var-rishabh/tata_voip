@@ -17,8 +17,19 @@ class CallProvider extends ChangeNotifier {
   Timer? _timer;
   int _secondsElapsed = 0;
 
+  VoidCallback? onCallReleased;
+
+  void setOnCallReleasedCallback(VoidCallback callback) {
+    onCallReleased = callback;
+  }
+
   void startCall(String number) async {
     await makeCall(number);
+  }
+
+  void pickUpCall() async {
+    await answerCall();
+    onCallReleased?.call();
   }
 
   void hangUpCall() async {
@@ -75,6 +86,8 @@ class CallProvider extends ChangeNotifier {
     changeCallStatus('Dialing ... ');
     isMuted = false;
     isSpeakerOn = false;
+    onCallReleased?.call();
+
     notifyListeners();
   }
 

@@ -46,6 +46,24 @@ Future<bool> toggleMute(bool isMute) async {
   }
 }
 
+Future<int> answerCall() async {
+  try {
+    int callAnswered = await platform.invokeMethod('answerCall');
+    return callAnswered;
+  } catch (e) {
+    print('$tag | Failed to answer call: $e');
+    return 0;
+  }
+}
+
+Future<void> endIncomingCall() async {
+  try {
+    await platform.invokeMethod('endIncomingCall');
+  } catch (e) {
+    print('$tag | Failed to end incoming call: $e');
+  }
+}
+
 Future<void> endCall() async {
   try {
     await platform.invokeMethod('endCall');

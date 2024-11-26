@@ -2,10 +2,13 @@ package com.example.tata_voip;
 
 import android.util.Log;
 
+import com.example.tata_voip.CallListener;
+
 import org.linphone.core.Account;
 import org.linphone.core.AccountParams;
 import org.linphone.core.Address;
 import org.linphone.core.AuthInfo;
+import org.linphone.core.Call;
 import org.linphone.core.CallParams;
 import org.linphone.core.Core;
 import org.linphone.core.CoreListenerStub;
@@ -79,6 +82,18 @@ public class LinOperation extends CoreListenerStub {
         } catch (Exception e) {
             Log.e(TAG, "Failed to toggle speaker", e);
             return false;
+        }
+    }
+
+    public static int answerCall() {
+        try {
+            Call currentCall = CallListener.getCurrentCall();
+            int callAnswered = currentCall.accept();
+            CallListener.setCurrentCall(null);
+            return callAnswered;
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to answer call", e);
+            return -1;
         }
     }
 

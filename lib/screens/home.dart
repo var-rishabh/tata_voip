@@ -1,7 +1,11 @@
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 
 import '../helper/method_channel.dart';
+import '../helper/native_channel.dart';
+import '../provider/call.dart';
 import 'call_screen.dart';
+import 'incoming_call.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -22,6 +26,22 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     login();
+
+    NativeChannel.startListening((event) {
+      String key = event.keys.first.toString();
+      switch (key) {
+        case 'INCOMING_RECEIVED':
+          String contactNumber = event['INCOMING_RECEIVED'].toString();
+          contactNumber = contactNumber.substring(4);
+          print("LIN_SDK 50: $contactNumber");
+          Navigator.of(context).push(
+            CupertinoPageRoute(
+              builder: (_) => IncomingCall(contactNumber: contactNumber),
+            ),
+          );
+          break;
+      }
+    });
   }
 
   @override
@@ -58,6 +78,8 @@ class _HomeState extends State<Home> {
                   ),
                   trailing: GestureDetector(
                     onTap: () => {
+                      Provider.of<CallProvider>(context, listen: false)
+                          .startCall(contacts[name]!),
                       Navigator.of(context).push(
                         CupertinoPageRoute(
                           builder: (_) => CallScreen(
