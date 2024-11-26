@@ -13,6 +13,8 @@ import org.linphone.core.Factory;
 import org.linphone.core.MediaEncryption;
 import org.linphone.core.TransportType;
 
+import java.util.Objects;
+
 public class LinOperation extends CoreListenerStub {
     private static final String TAG = "LIN_SDK";
 
@@ -65,6 +67,27 @@ public class LinOperation extends CoreListenerStub {
             return true;
         } catch (Exception e) {
             Log.e(TAG, "Failed to make call", e);
+            return false;
+        }
+    }
+
+    public static boolean toggleSpeaker(Core linPhoneCore, boolean speakerStatus) {
+        try {
+            Log.d(TAG, "Toggling speaker" + Objects.requireNonNull(linPhoneCore.getCurrentCall()).getSpeakerMuted());
+            linPhoneCore.getCurrentCall().setSpeakerMuted(speakerStatus);
+            return linPhoneCore.getCurrentCall().getSpeakerMuted();
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to toggle speaker", e);
+            return false;
+        }
+    }
+
+    public static boolean toggleMute(Core linPhoneCore, boolean muteStatus) {
+        try {
+            linPhoneCore.setMicEnabled(!muteStatus);
+            return linPhoneCore.isMicEnabled();
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to toggle mute", e);
             return false;
         }
     }

@@ -102,7 +102,7 @@ class _CallScreenState extends State<CallScreen> {
                 callProvider.isSpeakerOn
                     ? CupertinoIcons.volume_up
                     : CupertinoIcons.volume_off,
-                callProvider.toggleSpeaker,
+                callProvider.changeSpeaker,
               ),
               GestureDetector(
                 onTap: () {
@@ -125,7 +125,7 @@ class _CallScreenState extends State<CallScreen> {
                 callProvider.isMuted
                     ? CupertinoIcons.mic_slash
                     : CupertinoIcons.mic,
-                callProvider.toggleMute,
+                callProvider.changeMute,
               ),
             ],
           ),

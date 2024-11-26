@@ -26,13 +26,17 @@ class CallProvider extends ChangeNotifier {
     stopTime();
   }
 
-  void toggleMute() {
+  void changeMute() async {
     isMuted = !isMuted;
+
+    await toggleMute(isMuted);
     notifyListeners();
   }
 
-  void toggleSpeaker() {
+  void changeSpeaker() async {
     isSpeakerOn = !isSpeakerOn;
+
+    await toggleSpeaker(isSpeakerOn);
     notifyListeners();
   }
 
@@ -65,8 +69,9 @@ class CallProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void resetEverything() {
+  void resetEverything() async {
     stopTime();
+    await toggleMute(false);
     changeCallStatus('Dialing ... ');
     isMuted = false;
     isSpeakerOn = false;

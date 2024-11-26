@@ -29,6 +29,14 @@ public class MainActivity extends FlutterActivity {
 
         CallListener callListener = new CallListener();
         linPhoneCore.addListener(callListener);
+
+        requestPermissions();
+    }
+
+    private void requestPermissions() {
+        if (checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{android.Manifest.permission.RECORD_AUDIO}, 1);
+        }
     }
 
     @Override
@@ -65,6 +73,18 @@ public class MainActivity extends FlutterActivity {
                     if (!isCallSuccess) {
                         result.error("CALL_ERROR", "Call failed", null);
                     }
+                    break;
+
+                case "toggleSpeaker":
+                    boolean speakerStatus = Boolean.TRUE.equals(call.argument("isSpeakerOn"));
+                    boolean isSpeakerOn = LinOperation.toggleSpeaker(linPhoneCore, speakerStatus);
+                    result.success(isSpeakerOn);
+                    break;
+
+                case "toggleMute":
+                    boolean muteStatus = Boolean.TRUE.equals(call.argument("isMute"));
+                    boolean isMuteOn = LinOperation.toggleMute(linPhoneCore, muteStatus);
+                    result.success(isMuteOn);
                     break;
 
                 case "endCall":

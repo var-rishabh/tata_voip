@@ -23,6 +23,29 @@ Future<void> makeCall(String number) async {
   }
 }
 
+Future<bool> toggleSpeaker(bool speakerStatus) async {
+  try {
+    bool isSpeakerOn = await platform.invokeMethod('toggleSpeaker', {
+      "isSpeakerOn": speakerStatus,
+    });
+    return isSpeakerOn;
+  } catch (e) {
+    print('$tag | Failed to toggle speaker: $e');
+    return false;
+  }
+}
+
+Future<bool> toggleMute(bool isMute) async {
+  try {
+    bool isMuted =
+        await platform.invokeMethod('toggleMute', {"isMute": isMute});
+    return isMuted;
+  } catch (e) {
+    print('$tag | Failed to toggle mute: $e');
+    return false;
+  }
+}
+
 Future<void> endCall() async {
   try {
     await platform.invokeMethod('endCall');
